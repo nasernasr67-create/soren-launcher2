@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="fa"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لانچر نئون آبی</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600&family=Vazirmatn:wght@400;600;800&display=swap">
+<style>
+/* Layout: XT112-style cockpit. Speed + spectrum on top, album disc and analog clock in twin neon rings, a perspective road with the car between them, raised neon base line, 7 glass app icons under it. */
+:root {
+  --bg: #020818;
+  --neon: #19b4ff;
+  --neon-2: #3d5bff;
+  --warn: #ff3d6e;
+  --fg: #e8f4ff;
+  --mute: #7f9fd0;
+  --line: #123073;
+  --panel: #061230;
+  --font-display: "Orbitron", "OrbitronLocal", "Vazirmatn", "VazirLocal", sans-serif;
+  --font-tech: "Rajdhani", "Vazirmatn", "VazirLocal", sans-serif;
+  --font-body: "Vazirmatn", "VazirLocal", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  padding-block: 20px 32px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 1024px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+.head h1 { margin: 0; font-size: 20px; font-weight: 800; }
+.head p { margin: 4px 0 0; color: var(--mute); font-size: 13px; line-height: 1.7; }
+
+.frame { width: 100%; aspect-ratio: 1024 / 600; position: relative; overflow: hidden; border-radius: 10px; border: 2px solid #0a1a3d; box-shadow: 0 0 0 1px #000, 0 0 46px -10px var(--neon); }
+.stage {
+  width: 1024px; height: 600px; position: absolute; top: 0; left: 0; transform-origin: 0 0; overflow: hidden; direction: ltr;
+  background:
+    radial-gradient(560px 320px at 50% 38%, color-mix(in srgb, var(--neon) 34%, transparent), transparent 72%),
+    radial-gradient(760px 380px at 50% 118%, color-mix(in srgb, var(--neon-2) 55%, transparent), transparent 70%),
+    linear-gradient(180deg, #031445 0%, #020b26 55%, #01040f 100%);
+}
+.art { position: absolute; inset: 0; width: 1024px; height: 600px; }
+.gl { filter: drop-shadow(0 0 4px var(--neon)) drop-shadow(0 0 12px color-mix(in srgb, var(--neon) 65%, transparent)); }
+.nl { fill: none; stroke: var(--neon); stroke-linecap: round; stroke-linejoin: round; }
+.w3 { stroke-width: 3; } .w5 { stroke-width: 5; } .w7 { stroke-width: 7; }
+.core { fill: none; stroke: #e6f7ff; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: .85; }
+.dotn { fill: var(--neon); }
+.hand { stroke-linecap: round; }
+
+/* top bar */
+.topbar { position: absolute; left: 24px; right: 24px; top: 12px; height: 36px; display: flex; align-items: center; justify-content: space-between; color: var(--fg); }
+.topbar .grp { display: flex; align-items: center; gap: 18px; }
+.topbar svg { width: 30px; height: 30px; fill: none; stroke: var(--fg); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.topbar .txt { font-size: 15px; font-weight: 600; }
+.topbar .tech { font-family: var(--font-display); font-size: 15px; font-weight: 700; letter-spacing: .08em; }
+.topbar .mute { font-family: var(--font-tech); font-weight: 600; font-size: 16px; color: var(--mute); letter-spacing: .06em; }
+
+/* speed */
+.speed { position: absolute; left: 0; right: 0; top: 60px; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+.speed b { font-family: var(--font-display); font-weight: 900; font-size: 66px; line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0 0 22px color-mix(in srgb, var(--neon) 80%, transparent); }
+.speed .bar { width: 28px; height: 4px; margin-top: 6px; background: var(--neon); box-shadow: 0 0 10px var(--neon); border-radius: 2px; transition: width .3s; }
+.speed span { margin-top: 5px; font-family: var(--font-display); font-size: 11px; letter-spacing: .4em; padding-inline-start: .4em; color: var(--mute); }
+.date { position: absolute; left: 650px; top: 116px; font-size: 14px; font-weight: 600; color: var(--fg); letter-spacing: .04em; }
+
+/* disc + clock captions */
+.disc { position: absolute; left: 131px; top: 231px; width: 168px; height: 168px; border-radius: 50%; border: 0; padding: 0; cursor: pointer;
+  background: radial-gradient(circle, #020818 0 9%, #cfeaff 10% 12%, transparent 13%),
+    conic-gradient(from 0deg, #0a2f7a, var(--neon), #e8f6ff, var(--neon-2), #0a2f7a 50%, var(--neon), #bfe6ff, var(--neon-2), #0a2f7a);
+  box-shadow: 0 0 30px -4px var(--neon), inset 0 0 0 4px rgba(2, 8, 24, .55), inset 0 0 30px rgba(2, 8, 24, .6); animation: spin 9s linear infinite; }
+.disc::after { content: ""; position: absolute; inset: 22px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .22); box-shadow: 0 0 0 14px rgba(2, 8, 24, .12); }
+.disc.paused { animation-play-state: paused; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.chev { position: absolute; top: 291px; width: 36px; height: 48px; border: 0; background: none; cursor: pointer; display: grid; place-items: center; color: var(--fg); z-index: 2; }
+.chev svg { width: 18px; height: 22px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 5px var(--neon)); }
+.cap { position: absolute; top: 428px; width: 220px; text-align: center; font-family: var(--font-display); font-size: 11px; letter-spacing: .18em; color: var(--mute); white-space: nowrap; }
+
+.slogan { position: absolute; left: 0; right: 0; top: 237px; display: flex; justify-content: center; align-items: center; gap: 12px; direction: rtl; pointer-events: none; font-weight: 800; font-size: 16px; line-height: 1; color: var(--fg); text-shadow: 0 0 10px var(--neon), 0 0 22px color-mix(in srgb, var(--neon) 70%, transparent); }
+.slogan::before, .slogan::after { content: ""; width: 34px; height: 2px; box-shadow: 0 0 8px var(--neon); }
+.slogan::before { background: linear-gradient(90deg, var(--neon), transparent); }
+.slogan::after { background: linear-gradient(90deg, transparent, var(--neon)); }
+
+/* dock */
+.dock { position: absolute; left: 24px; right: 24px; top: 474px; display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.app { appearance: none; border: 0; background: none; font: inherit; color: var(--fg); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0; }
+.ico { width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center; border: 2px solid var(--c);
+  background: linear-gradient(160deg, #ffffff 0%, color-mix(in srgb, var(--c) 35%, white) 100%);
+  box-shadow: 0 0 14px var(--c), 0 0 30px -6px var(--c), inset 0 -8px 14px -8px color-mix(in srgb, var(--c) 70%, transparent); transition: transform .15s, box-shadow .15s; }
+.ico svg { width: 34px; height: 34px; fill: none; stroke: #0a2a6c; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.app em { font-style: normal; font-size: 13px; font-weight: 600; text-shadow: 0 0 8px var(--neon); }
+.app:active .ico, .app.on .ico { transform: scale(.94); box-shadow: 0 0 22px var(--c), 0 0 44px -4px var(--c), inset 0 -8px 14px -8px color-mix(in srgb, var(--c) 70%, transparent); }
+.app:focus-visible, .disc:focus-visible, .chev:focus-visible, .btn:focus-visible, .sw button:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
+
+/* tools below the stage */
+.tools { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+.tools .lbl { color: var(--mute); font-size: 13px; }
+.sw { display: flex; gap: 8px; }
+.sw button { width: 34px; height: 34px; border-radius: 50%; border: 2px solid #123073; cursor: pointer; padding: 0; }
+.sw button[aria-pressed="true"] { border-color: var(--fg); box-shadow: 0 0 14px -2px currentColor; }
+.btn { appearance: none; font: inherit; font-size: 14px; font-weight: 600; color: var(--fg); background: var(--panel); border: 1px solid #123073; border-radius: 10px; padding: 9px 16px; cursor: pointer; }
+.btn[aria-pressed="true"] { border-color: var(--neon); color: var(--neon); }
+.note { color: var(--mute); font-size: 12.5px; line-height: 1.8; margin: 0; }
+@media (prefers-reduced-motion: reduce) { .disc { animation: none; } .speed .bar { transition: none; } }
+/* ---- full-screen head unit mode ---- */
+@font-face { font-family: "VazirLocal"; src: url("fonts/Vazirmatn.ttf"); font-weight: 100 900; }
+@font-face { font-family: "OrbitronLocal"; src: url("fonts/Orbitron.ttf"); font-weight: 400 900; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #020818; }
+body { padding: 0 !important; }
+.page { max-width: none; margin: 0; gap: 0; display: block; width: 100vw; height: 100vh; position: relative; }
+.head, .tools, .note { display: none !important; }
+.page .frame { position: absolute; left: 50%; top: 50%; width: 1024px; height: 600px; aspect-ratio: auto; border: 0; border-radius: 0; box-shadow: none; transform-origin: 50% 50%; }
+</style>
+
+</head><body>
+<div class="page" dir="rtl">
+  <div class="head">
+    <h1>لانچر نئون آبی، سبک XT112</h1>
+    <p>همان چیدمان XT112 با زمینه و نئون آبی. روی دیسک بزن تا موزیک پخش یا متوقف شود، رنگ نئون را عوض کن و سرعت را شبیه‌سازی کن.</p>
+  </div>
+
+  <div class="frame" id="frame">
+    <div class="stage" id="stage">
+      <svg class="art" viewBox="0 0 1024 600" aria-hidden="true">
+        <defs>
+          <clipPath id="floorclip"><polygon points="416,255 608,255 780,440 244,440"/></clipPath>
+          <linearGradient id="floorg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" style="stop-color:var(--neon);stop-opacity:.04"/>
+            <stop offset="1" style="stop-color:var(--neon);stop-opacity:.34"/>
+          </linearGradient>
+          <linearGradient id="barg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" style="stop-color:#bfeaff"/>
+            <stop offset="1" style="stop-color:var(--neon-2)"/>
+          </linearGradient>
+          <radialGradient id="cg">
+            <stop offset="0" style="stop-color:var(--neon);stop-opacity:.75"/>
+            <stop offset="1" style="stop-color:var(--neon);stop-opacity:0"/>
+          </radialGradient>
+          <linearGradient id="carg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#ffffff"/>
+            <stop offset=".55" stop-color="#cfe6ff"/>
+            <stop offset="1" stop-color="#7fb4ee"/>
+          </linearGradient>
+          <circle id="ringL" cx="215" cy="315" r="108"/>
+          <circle id="ringR" cx="809" cy="315" r="108"/>
+          <path id="arcL" d="M92.900 293.500 A124 124 0 0 1 257.400 198.500"/>
+          <path id="arcR" d="M766.600 198.500 A124 124 0 0 1 931.100 293.500"/>
+          <path id="vL" d="M283 398 L416 255"/>
+          <path id="vR" d="M741 398 L608 255"/>
+          <path id="topC" d="M243 211 C300 196 340 206 372 232 H652 C684 206 724 196 781 211"/>
+          <path id="baseL" d="M24 462 H296 L346 442 H678 L728 462 H1000"/>
+        </defs>
+
+        <!-- road -->
+        <g clip-path="url(#floorclip)">
+          <polygon points="416,255 608,255 780,440 244,440" fill="url(#floorg)"/>
+          <g id="grid" class="gl" style="stroke:var(--neon);stroke-width:1.3"></g>
+        </g>
+
+        <!-- spectrum -->
+        <g id="spec" class="gl"></g>
+
+        <!-- ring bodies -->
+        <circle cx="215" cy="315" r="108" fill="#030c24"/>
+        <circle cx="809" cy="315" r="108" fill="#030c24"/>
+
+        <!-- neon lines -->
+        <g class="gl">
+          <use href="#topC" class="nl w5"/><use href="#topC" class="core"/>
+          <use href="#vL" class="nl w7"/><use href="#vL" class="core"/>
+          <use href="#vR" class="nl w7"/><use href="#vR" class="core"/>
+          <use href="#ringL" class="nl w7"/><use href="#ringL" class="core"/>
+          <use href="#ringR" class="nl w7"/><use href="#ringR" class="core"/>
+          <use href="#arcL" class="nl w3"/><use href="#arcR" class="nl w3"/>
+          <use href="#baseL" class="nl w5"/><use href="#baseL" class="core"/>
+          <path d="M60 472 H290 L340 452 H684 L734 472 H964" class="nl w3" opacity=".4"/>
+        </g>
+
+        <!-- car -->
+        <ellipse cx="512" cy="432" rx="130" ry="20" fill="url(#cg)"/>
+        <g transform="translate(512 356) scale(.35) translate(-450 -250)">
+          <defs>
+            <linearGradient id="carw" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ffffff"/>
+              <stop offset=".55" stop-color="#eaf3ff"/>
+              <stop offset="1" stop-color="#b4d0f0"/>
+            </linearGradient>
+            <linearGradient id="sideshade" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#5f93d6" stop-opacity=".6"/>
+              <stop offset=".16" stop-color="#5f93d6" stop-opacity="0"/>
+              <stop offset=".84" stop-color="#5f93d6" stop-opacity="0"/>
+              <stop offset="1" stop-color="#5f93d6" stop-opacity=".6"/>
+            </linearGradient>
+            <linearGradient id="underglow" x1="0" y1="0" x2="0" y2="1">
+              <stop offset=".6" style="stop-color:var(--neon);stop-opacity:0"/>
+              <stop offset="1" style="stop-color:var(--neon);stop-opacity:.5"/>
+            </linearGradient>
+            <linearGradient id="glassg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#1a47a0"/>
+              <stop offset="1" stop-color="#061a45"/>
+            </linearGradient>
+            <path id="bodyp" d="M232 146 Q450 126 668 146 L684 200 Q716 222 722 262 L722 398 Q720 414 700 414 L200 414 Q180 414 178 398 L178 262 Q184 222 216 200 Z"/>
+          </defs>
+          <!-- ground shadow -->
+          <ellipse cx="450" cy="432" rx="300" ry="30" fill="#000" opacity=".5"/>
+          <!-- tyres -->
+          <rect x="182" y="360" width="76" height="118" rx="18" fill="#04122e" stroke="#1a3d8a" stroke-width="4"/>
+          <rect x="642" y="360" width="76" height="118" rx="18" fill="#04122e" stroke="#1a3d8a" stroke-width="4"/>
+          <path d="M194 440 H246 M654 440 H706" stroke="#12306e" stroke-width="3"/>
+          <!-- mirrors -->
+          <path d="M206 128 Q198 142 212 156 L236 150 L238 128 Z" fill="#eaf4ff" stroke="#9cc0e8" stroke-width="3"/>
+          <path d="M694 128 Q702 142 688 156 L664 150 L662 128 Z" fill="#eaf4ff" stroke="#9cc0e8" stroke-width="3"/>
+          <!-- cabin -->
+          <path d="M296 34 Q450 22 604 34 L670 148 L230 148 Z" fill="url(#carw)"/>
+          <path d="M254 138 L303 44 Q450 34 597 44 L646 138 Q450 124 254 138 Z" fill="url(#glassg)" stroke="#8fd0ff" stroke-width="3"/>
+          <rect x="330" y="98" width="58" height="28" rx="11" fill="#2f63c9" opacity=".85"/>
+          <rect x="514" y="96" width="62" height="30" rx="11" fill="#2f63c9" opacity=".85"/>
+          <rect x="428" y="70" width="58" height="16" rx="4" fill="#cfe6ff" opacity=".75"/>
+          <path d="M300 60 L352 52 L314 130 L268 132Z" fill="#ffffff" opacity=".16"/>
+          <path d="M520 50 L560 46 L538 124 L508 124Z" fill="#ffffff" opacity=".08"/>
+          <g style="filter:drop-shadow(0 0 5px #ff3b2f)">
+            <rect x="404" y="120" width="92" height="9" rx="4" fill="#3a0c14"/>
+            <path d="M412 124.500 H488" stroke="#ff4a3a" stroke-width="3" stroke-linecap="round"/>
+          </g>
+          <!-- body and trunk -->
+          <use href="#bodyp" fill="url(#carw)" stroke="#cfe8ff" stroke-width="3"/>
+          <use href="#bodyp" fill="url(#sideshade)"/>
+          <use href="#bodyp" fill="url(#underglow)"/>
+          <path d="M246 152 L264 282 L636 282 L654 152" fill="none" stroke="#9cc0e8" stroke-width="3"/>
+          <path d="M246 152 Q450 134 654 152" fill="none" stroke="#9cc0e8" stroke-width="3"/>
+          <path d="M252 160 Q450 144 648 160" fill="none" stroke="#ffffff" stroke-width="7" opacity=".9"/>
+          <path d="M262 172 Q450 154 640 172 L632 202 Q450 186 270 202Z" fill="#ffffff" opacity=".5"/>
+          <path d="M300 162 L382 160 L332 272 L268 274Z" fill="#ffffff" opacity=".2"/>
+          <path d="M200 352 Q450 366 700 352" fill="none" stroke="#a9c8ea" stroke-width="3"/>
+          <path d="M204 394 Q450 410 696 394 L698 404 Q696 414 684 414 L216 414 Q202 414 202 404Z" fill="#8fb0d6" opacity=".55"/>
+          <!-- taillights -->
+          <g style="filter:drop-shadow(0 0 12px #ff3b2f)">
+            <path d="M194 214 Q250 210 322 206 Q332 210 326 234 L264 262 Q236 266 214 258 Q194 248 194 214Z" fill="#6e0b18" stroke="#fff0e6" stroke-width="3"/>
+            <path d="M201 221 Q250 217 318 212 Q324 219 320 230 L262 256 Q236 259 217 252 Q201 244 201 221Z" fill="#c5162a" opacity=".9"/>
+            <path d="M206 224 L316 216" stroke="#ffb040" stroke-width="8" stroke-linecap="round" fill="none"/>
+            <path d="M210 241 Q252 234 312 230" stroke="#ff6a4a" stroke-width="6" stroke-linecap="round" fill="none"/>
+            <path d="M204 214 Q252 210 320 207" stroke="#ffffff" stroke-width="2" opacity=".7" fill="none"/>
+            <path d="M706 214 Q650 210 578 206 Q568 210 574 234 L636 262 Q664 266 686 258 Q706 248 706 214Z" fill="#6e0b18" stroke="#fff0e6" stroke-width="3"/>
+            <path d="M699 221 Q650 217 582 212 Q576 219 580 230 L638 256 Q664 259 683 252 Q699 244 699 221Z" fill="#c5162a" opacity=".9"/>
+            <path d="M694 224 L584 216" stroke="#ffb040" stroke-width="8" stroke-linecap="round" fill="none"/>
+            <path d="M690 241 Q648 234 588 230" stroke="#ff6a4a" stroke-width="6" stroke-linecap="round" fill="none"/>
+            <path d="M696 214 Q648 210 580 207" stroke="#ffffff" stroke-width="2" opacity=".7" fill="none"/>
+          </g>
+          <!-- plate area -->
+          <rect x="330" y="204" width="240" height="74" rx="10" fill="#d3e3f6" opacity=".7"/>
+          <circle cx="386" cy="211" r="6" fill="#ffb347"/><circle cx="490" cy="211" r="6" fill="#ffb347"/>
+          <rect x="344" y="220" width="212" height="46" rx="6" fill="#f8fbff" stroke="#7fa4d6" stroke-width="3"/>
+          <rect x="344" y="220" width="24" height="46" rx="6" fill="#2f5fd0"/>
+          <rect x="350" y="226" width="12" height="3" fill="#239f40"/><rect x="350" y="229" width="12" height="3" fill="#ffffff"/><rect x="350" y="232" width="12" height="3" fill="#da0000"/>
+          <text x="356" y="258" text-anchor="middle" font-family="Orbitron, sans-serif" font-size="11" font-weight="700" fill="#ffffff">IR</text>
+          <g font-family="Vazirmatn, sans-serif" font-weight="800" fill="#10131c" text-anchor="middle">
+            <text x="390" y="254" font-size="30">۵۳</text>
+            <text x="424" y="254" font-size="28">د</text>
+            <text x="458" y="254" font-size="30">۵۵۳</text>
+            <text x="522" y="236" font-size="12" font-weight="600">ایران</text>
+            <text x="522" y="259" font-size="28">۳۸</text>
+          </g>
+          <rect x="484" y="224" width="2" height="38" fill="#10131c" opacity=".6"/>
+          <!-- bumper details -->
+          <circle cx="252" cy="310" r="6" fill="#cfdcec" stroke="#9ab6d6" stroke-width="2"/>
+          <circle cx="447" cy="314" r="6" fill="#cfdcec" stroke="#9ab6d6" stroke-width="2"/>
+          <circle cx="644" cy="314" r="6" fill="#cfdcec" stroke="#9ab6d6" stroke-width="2"/>
+          <rect x="194" y="344" width="58" height="14" rx="7" fill="#c21d30"/>
+          <rect x="642" y="350" width="58" height="14" rx="7" fill="#c21d30"/>
+          <ellipse cx="236" cy="404" rx="14" ry="5" fill="#27344b" stroke="#9db9d9" stroke-width="2"/>
+        </g>
+
+        <!-- analog clock -->
+        <g transform="translate(809 315)">
+          <circle r="88" fill="#04122e" stroke="#12306e" stroke-width="1.5"/>
+          <g id="dots"></g>
+          <g class="gl"><path d="M-72.700 42 A84 84 0 0 1 -64.300 -54" class="nl w3"/></g>
+          <g id="hh" class="hand"><line x1="0" y1="6" x2="0" y2="-40" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/></g>
+          <g id="mm" class="hand"><line x1="0" y1="8" x2="0" y2="-60" stroke="#ffffff" stroke-width="3.500" stroke-linecap="round"/></g>
+          <g id="ss" class="hand gl"><line x1="0" y1="14" x2="0" y2="-68" style="stroke:var(--neon)" stroke-width="1.600" stroke-linecap="round"/></g>
+          <circle r="6" style="fill:var(--neon)"/><circle r="2.500" fill="#020818"/>
+        </g>
+      </svg>
+
+      <div class="topbar">
+        <div class="grp">
+          <svg viewBox="0 0 32 32"><path d="M3 20 L8 11 H24 L29 20 Z"/></svg>
+          <span class="txt">خانه ماشین</span>
+        </div>
+        <div class="grp">
+          <span class="mute">0B/s</span>
+          <svg viewBox="0 0 32 32" style="width:22px"><path d="M9 10l14 12-7 6V4l7 6L9 22"/></svg>
+          <span class="tech" id="sclock">11:35</span>
+          <svg viewBox="0 0 32 32"><rect x="4" y="9" width="19" height="13" rx="2"/><path d="M9 5h19v14"/></svg>
+          <svg viewBox="0 0 32 32"><path d="M26 10H11a6 6 0 000 12h8M15 5l-5 5 5 5"/></svg>
+        </div>
+      </div>
+
+      <div class="speed">
+        <b id="spd">62</b>
+        <div class="bar" id="sbar"></div>
+        <span>KM/H</span>
+      </div>
+      <div class="date" id="date">یکشنبه ۰۸/۱۷</div>
+
+      <div class="slogan">ماشین فقط سمند سورن</div>
+      <button type="button" class="chev" style="left:101px" id="prev" aria-label="آهنگ قبلی"><svg viewBox="0 0 18 22"><path d="M13 3L5 11l8 8"/></svg></button>
+      <button type="button" class="disc" id="disc" aria-label="پخش یا توقف موزیک"></button>
+      <button type="button" class="chev" style="left:285px" id="next" aria-label="آهنگ بعدی"><svg viewBox="0 0 18 22"><path d="M5 3l8 8-8 8"/></svg></button>
+      <div class="cap" style="left:105px" id="track">AUDIO</div>
+      <div class="cap" style="left:699px" id="secs">TEHRAN 11:35:00</div>
+
+      <div class="dock">
+        <button type="button" class="app" style="--c:#1fd6ff"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 005 9.5C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/></svg></span><em>نقشه</em></button>
+        <button type="button" class="app" style="--c:#3d7bff"><span class="ico"><svg viewBox="0 0 24 24"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></svg></span><em>بلوتوث</em></button>
+        <button type="button" class="app" style="--c:#59a8ff"><span class="ico"><svg viewBox="0 0 24 24"><path d="M4 9h16v10H4zM8 9l8-5M8 14h5"/><circle cx="17" cy="14" r="1.500"/></svg></span><em>رادیو</em></button>
+        <button type="button" class="app" style="--c:#19e6d0"><span class="ico"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.500" cy="18" r="2.500"/><circle cx="16.500" cy="16" r="2.500"/></svg></span><em>موزیک</em></button>
+        <button type="button" class="app" style="--c:#7c8cff"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/></svg></span><em>ویدیو</em></button>
+        <button type="button" class="app" style="--c:#7fdcff"><span class="ico"><svg viewBox="0 0 24 24"><path d="M3 17l2-6 2-3h10l2 3 2 6v2h-3v-2H6v2H3zM7 14h.01M17 14h.01"/></svg></span><em>تنظیمات ماشین</em></button>
+        <button type="button" class="app" style="--c:#2bb7ff"><span class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg></span><em>برنامه‌ها</em></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tools">
+    <span class="lbl">رنگ نئون</span>
+    <div class="sw" id="sw">
+      <button type="button" style="background:#19b4ff;color:#19b4ff" data-n="#19b4ff" data-n2="#3d5bff" aria-pressed="true" aria-label="آبی یخی"></button>
+      <button type="button" style="background:#2f6bff;color:#2f6bff" data-n="#2f6bff" data-n2="#7a3dff" aria-pressed="false" aria-label="آبی الکتریک"></button>
+      <button type="button" style="background:#00f0ff;color:#00f0ff" data-n="#00f0ff" data-n2="#0a8bff" aria-pressed="false" aria-label="فیروزه‌ای"></button>
+    </div>
+    <button type="button" class="btn" id="sim" aria-pressed="false">شبیه‌سازی سرعت</button>
+  </div>
+  <p class="note">جاده زیر ماشین با سرعت حرکت می‌کند و طیف صدا با موزیک می‌رقصد. نام آهنگ و سرعت نمونه‌اند. ساعت و تاریخ زنده‌اند.</p>
+</div>
+
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  var rm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var frame = document.getElementById('frame'), stage = document.getElementById('stage');
+  function fit() {
+    var k = Math.min(window.innerWidth / 1024, window.innerHeight / 600);
+    stage.style.transform = 'none';
+    frame.style.transform = 'translate(-50%, -50%) scale(' + k + ')';
+  }
+  fit();
+  window.addEventListener('resize', fit);
+
+  function el(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    parent.appendChild(e); return e;
+  }
+
+  // road grid: vanishing point (512,152), floor top y=255, bottom y=440
+  var VY = 152, gridG = document.getElementById('grid'), vlines = [], hlines = [];
+  for (var i = 0; i <= 12; i++) {
+    var xb = 244 + i * (536 / 12), xt = 512 + (xb - 512) * 0.358;
+    el('line', { x1: xt.toFixed(1), y1: 255, x2: xb.toFixed(1), y2: 440, opacity: .55 }, gridG);
+  }
+  for (var k = 0; k < 10; k++) hlines.push(el('line', { x1: 200, x2: 824 }, gridG));
+  var phase = 0;
+  function drawGrid() {
+    for (var k = 0; k < hlines.length; k++) {
+      var y = VY + 103 * Math.pow(1.2, k + phase), op = Math.max(0, Math.min(1, (y - 255) / 90)) * .85;
+      hlines[k].setAttribute('y1', y.toFixed(1)); hlines[k].setAttribute('y2', y.toFixed(1));
+      hlines[k].setAttribute('opacity', op.toFixed(2));
+    }
+  }
+
+  // spectrum bars
+  var specG = document.getElementById('spec'), bars = [], NB = 40, BW = 6.8;
+  for (var b = 0; b < NB; b++) bars.push(el('rect', { x: (376 + b * BW).toFixed(1), width: 4.6, rx: 1, fill: 'url(#barg)' }, specG));
+  function drawBars(t, on) {
+    for (var b = 0; b < NB; b++) {
+      var env = Math.sin(Math.PI * (b + .5) / NB);
+      var h = on ? 5 + env * 50 * (0.35 + 0.65 * Math.abs(Math.sin(t * (1.3 + (b % 7) * .27) + b * 1.7))) : 4;
+      bars[b].setAttribute('height', h.toFixed(1));
+      bars[b].setAttribute('y', (232 - h - 2).toFixed(1));
+    }
+  }
+
+  // clock face dots
+  var dots = document.getElementById('dots');
+  for (var d = 0; d < 12; d++) {
+    var a = d * 30 * Math.PI / 180, major = d % 3 === 0;
+    el('circle', { cx: (74 * Math.sin(a)).toFixed(1), cy: (-74 * Math.cos(a)).toFixed(1), r: major ? 3.4 : 2, class: major ? '' : 'dotn', fill: major ? '#e8f4ff' : '' }, dots);
+  }
+  var hh = document.getElementById('hh'), mm = document.getElementById('mm'), ss = document.getElementById('ss');
+
+  function tehran() {
+    var parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Tehran', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).formatToParts(new Date());
+    var o = {}; parts.forEach(function (p) { o[p.type] = p.value; });
+    return { h: +o.hour % 24, m: +o.minute, s: +o.second, ms: Date.now() % 1000 };
+  }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  var sclock = document.getElementById('sclock'), secs = document.getElementById('secs'), dateEl = document.getElementById('date');
+  function drawClock(smooth) {
+    var t = tehran(), s = t.s + (smooth ? t.ms / 1000 : 0);
+    hh.setAttribute('transform', 'rotate(' + ((t.h % 12) * 30 + t.m * .5).toFixed(1) + ')');
+    mm.setAttribute('transform', 'rotate(' + (t.m * 6 + s * .1).toFixed(1) + ')');
+    ss.setAttribute('transform', 'rotate(' + (s * 6).toFixed(1) + ')');
+    sclock.textContent = pad(t.h) + ':' + pad(t.m);
+    secs.textContent = 'TEHRAN ' + pad(t.h) + ':' + pad(t.m) + ':' + pad(t.s);
+  }
+  function drawDate() {
+    var d = new Date();
+    dateEl.textContent = d.toLocaleDateString('fa-IR', { weekday: 'long', timeZone: 'Asia/Tehran' }) + ' ' + d.toLocaleDateString('fa-IR', { month: '2-digit', day: '2-digit', timeZone: 'Asia/Tehran' });
+  }
+  drawDate(); setInterval(drawDate, 600000);
+
+  // speed
+  var spdEl = document.getElementById('spd'), sbar = document.getElementById('sbar'), speed = 62;
+  function setSpeed(v) {
+    speed = Math.max(0, Math.min(220, v));
+    spdEl.textContent = Math.round(speed);
+    sbar.style.width = (20 + speed / 220 * 110).toFixed(0) + 'px';
+    sbar.style.background = speed > 160 ? 'var(--warn)' : 'var(--neon)';
+    sbar.style.boxShadow = '0 0 10px ' + (speed > 160 ? 'var(--warn)' : 'var(--neon)');
+  }
+  window.setSpeedNative = setSpeed;
+  setSpeed(window.Android ? 0 : 62);
+  var simOn = false, simT0 = 0, simBtn = document.getElementById('sim');
+  simBtn.addEventListener('click', function () {
+    simOn = !simOn; simT0 = 0;
+    simBtn.setAttribute('aria-pressed', simOn);
+    simBtn.textContent = simOn ? 'توقف شبیه‌سازی' : 'شبیه‌سازی سرعت';
+    if (!simOn) setSpeed(62);
+  });
+
+  // music
+  var playing = true, disc = document.getElementById('disc'), trackEl = document.getElementById('track');
+  var tracks = ['MIDNIGHT DRIVE', 'NEON HORIZON', 'BLUE VELOCITY'], ti = 0;
+  function showTrack() { if (window.Android) return; trackEl.textContent = tracks[ti]; }
+  disc.addEventListener('click', function () { playing = !playing; disc.classList.toggle('paused', !playing); if (rm) drawBars(0, playing); });
+  document.getElementById('prev').addEventListener('click', function () { ti = (ti + tracks.length - 1) % tracks.length; showTrack(); });
+  document.getElementById('next').addEventListener('click', function () { ti = (ti + 1) % tracks.length; showTrack(); });
+
+  // dock press feedback
+  document.querySelectorAll('.app').forEach(function (a) {
+    a.addEventListener('click', function () { a.classList.add('on'); setTimeout(function () { a.classList.remove('on'); }, 260); });
+  });
+
+  // neon colour
+  var sw = document.querySelectorAll('#sw button');
+  sw.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      sw.forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
+      btn.setAttribute('aria-pressed', 'true');
+      document.documentElement.style.setProperty('--neon', btn.dataset.n);
+      document.documentElement.style.setProperty('--neon-2', btn.dataset.n2);
+    });
+  });
+
+  // animation loop (about 30 fps)
+  var LITE = /[?&]lite=1/.test(location.search), FRAME_MS = LITE ? 80 : 32;
+  if (LITE) document.getElementById('spec').classList.remove('gl');
+  var last = 0, acc = 0;
+  drawGrid(); drawBars(0, true); drawClock(false);
+  if (rm) {
+    drawBars(1.2, true);
+    setInterval(function () { drawClock(false); }, 1000);
+  } else {
+    (function loop(ts) {
+      requestAnimationFrame(loop);
+      var dt = last ? ts - last : 16; last = ts; acc += dt;
+      if (acc < FRAME_MS) return;
+      var step = acc; acc = 0;
+      if (simOn) { if (!simT0) simT0 = ts; var s = (ts - simT0) / 1000; setSpeed(100 + 75 * Math.sin(s * .5) + 15 * Math.sin(s * 1.7)); }
+      phase += step / 1000 * (speed / 60) * .55; if (phase >= 1) phase -= Math.floor(phase);
+      drawGrid(); drawBars(ts / 1000, playing); drawClock(true);
+    })(0);
+  }
+})();
+</script>
+
+
+<script>
+(function () {
+  if (!window.Android) return;
+  var acts = ['map', 'bluetooth', 'radio', 'music', 'video', 'carsettings', 'apps'];
+  document.querySelectorAll('.app').forEach(function (a, i) {
+    a.addEventListener('click', function () { Android.launch(acts[i]); });
+  });
+  document.getElementById('disc').addEventListener('click', function () { Android.media('play_pause'); });
+  document.getElementById('prev').addEventListener('click', function () { Android.media('prev'); });
+  document.getElementById('next').addEventListener('click', function () { Android.media('next'); });
+})();
+</script>
+</body></html>
